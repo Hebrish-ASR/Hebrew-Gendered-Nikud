@@ -1,16 +1,30 @@
 # Hebrew-Gendered-Nikud
 
+![Status: idea / future](https://img.shields.io/badge/status-idea%20%2F%20future-lightgrey) ![Stage: 2 of 2](https://img.shields.io/badge/pipeline-stage%202%20of%202-informational)
+
 A Hebrew diacritizer (nikud model) with **speaker gender as a first-class input**. You pass unpointed Hebrew and the speaker's gender (`m`, `f` or `none`), and the model points the words whose vowels depend on that gender to match it.
 
 - Base: [`dicta-il/dictabert-large-char-menaked`](https://huggingface.co/dicta-il/dictabert-large-char-menaked), revision `4dfc20b94565d7868e1c8c00bf039d38c071a062`, CC-BY-4.0, by Dicta.
 - Hugging Face repo: [`Hebrish/Hebrew-Gendered-Nikud`](https://huggingface.co/Hebrish/Hebrew-Gendered-Nikud), created 2026-11-18. It is private and still an **unmodified server-side copy** of that revision. It becomes public with the first trained version.
-- Status (2026-11-18): planning. Nothing has been trained yet.
+- Status (2026-11-18): idea, for the future. Nothing has been trained. Work starts after stage 1, [Hebrew-Gendered-Sentence-Creator](https://github.com/Hebrish-ASR/Hebrew-Gendered-Sentence-Creator).
 
 ## Why
 
 The upstream model's `predict(sentences, tokenizer, mark_matres_lectionis=None)` takes no gender control. Checked in `BertForDiacritization.py` on 2026-11-18: each character gets the argmax of `nikud_logits` / `shin_logits`. So when a word is ambiguous, the model guesses the gender from the surrounding text. Which way it leans is not measured yet (plan step 1); masculine is the assumption.
 
 The main use is generation: writing Hebrew sentences for a given gender that people then read aloud (ASR training data, TTS).
+
+## The pipeline: why two models
+
+Hebrew marks the speaker's gender in two ways. **In the letters** (אני הולך / אני הולכת) the sentence has to be *written* for the right speaker; a nikud model only adds vowels to the letters it is given and cannot do that. That is stage 1, [Hebrew-Gendered-Sentence-Creator](https://github.com/Hebrish-ASR/Hebrew-Gendered-Sentence-Creator). **Only in the vowels** (אני רוצה: רוֹצֶה / רוֹצָה) the letters are already right and only nikud shows the gender. That is this repo, stage 2.
+
+```
+term + context + speaker_gender
+  -> [1] Hebrew-Gendered-Sentence-Creator -> unpointed Hebrew, letters right for the speaker
+  -> [2] Hebrew-Gendered-Nikud (gender=m|f) -> pointed Hebrew, vowels right for the speaker
+```
+
+The stages are separate models because LLMs are weak at writing nikud and dedicated nikud models are strong at it. Separate models can also be tested and replaced one at a time. This model also works on any Hebrew text, not only stage 1 output.
 
 ## Target: the speaker's gender (Daniel, 2026-11-18)
 
