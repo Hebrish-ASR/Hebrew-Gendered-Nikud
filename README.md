@@ -8,7 +8,7 @@ A Hebrew diacritizer (nikud model) with **speaker gender as a first-class input*
 
 ## Why
 
-The upstream model's `predict(sentences, tokenizer, mark_matres_lectionis=None)` takes no gender control. Checked in `BertForDiacritization.py` on 2026-11-18: each character gets the argmax of `nikud_logits` / `shin_logits`. So when a word is ambiguous, the model guesses the gender from the surrounding text, and in practice it guesses masculine.
+The upstream model's `predict(sentences, tokenizer, mark_matres_lectionis=None)` takes no gender control. Checked in `BertForDiacritization.py` on 2026-11-18: each character gets the argmax of `nikud_logits` / `shin_logits`. So when a word is ambiguous, the model guesses the gender from the surrounding text. Which way it leans is not measured yet (plan step 1); masculine is the assumption.
 
 The main use is generation: writing Hebrew sentences for a given gender that people then read aloud (ASR training data, TTS).
 
